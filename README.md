@@ -8,7 +8,7 @@ a pickle file. A-Z makes it really easy to grab lyrics, but it's also fairly eas
 includes a place for proxies.
 
 I also included the analysis file, which takes the pickle files and analyzes things like top words, unique words, and 
-total words. The end of the file converts the data into Pandas DataFrames and plots them using ggplot.  
+total words. The end of the file converts the data into a Pandas DataFrame and plots it using ggplot.  
 
 I wrote this code for this blog post:
 
