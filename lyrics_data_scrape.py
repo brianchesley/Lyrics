@@ -10,8 +10,56 @@ from urllib2 import urlopen
 import os
 from hashlib import sha1    
     
-    
-def check_proxy(proxies):      
+class makeRequests():
+    pass
+
+class Artist(Song, AzBase):
+    def __init___(self, artist_name):
+        super()
+        AzBase()
+        self.artist_name = artist_name
+
+    def getSongList(self):
+        url = AzBase.get_base_url() + self.artist_name[0] + '/' + self.artist_name + '.html'
+        sleep(random.randint(0,10))
+        response = requests.get(url, headers = {'User-Agent': random.choice(user_agents)}, proxies=random.choice(proxies))
+        soup = BeautifulSoup(response.content, 'lxml')
+        songs = []
+        for song in soup.findAll(target='_blank'):
+            songs.append(str(song.text))
+        return songs
+
+
+class Song(AzBase):
+    def __init__(self, songName, artistName):
+        super()
+        self.lyrics = None
+        self.url = None
+        self.songName = songName
+        self.artistName = artistName
+
+    def get_lyrics(self):
+        pass
+
+    def get_song_url(self):
+        song = re.sub('['+string.punctuation+']', '', self.song).replace(' ','').lower()
+        base = 'http://www.azlyrics.com/lyrics/'
+        rest = self.artist + '/' + self.song + '.html'
+        return base + rest
+
+
+class Cache():
+    pass
+
+class AzBase():
+    def __init__(self):
+        self.baseUrl = 'http://www.azlyrics.com/lyrics/'
+    def get_base_url(self):
+        return self.baseUrl
+
+
+
+def check_proxy(proxies):
     for i in proxies:
         try:
             urllib.urlopen('http://www.azlyrics.com/', proxies=i)
@@ -19,17 +67,6 @@ def check_proxy(proxies):
             print "This proxy doesn't work ", i
         else:
             print 'All good! here! ', i
-
-def check_proxy(proxies):      
-    for i in proxies:
-        try:
-            response = requests.get('http://www.azlyrics.com/', proxies=i)
-        except:
-            print "This proxy doesn't work ", i
-        else:
-            print 'All good! here! ', i
-            print response.content
-            
 
 
 def get_songs(proxies, user_agents, artists):
@@ -47,15 +84,6 @@ def get_songs(proxies, user_agents, artists):
         art_song_dict[artist] = lang
         pickle.dump(art_song_dict, open(artist + '_songs.pickle', 'wb'))
     return art_song_dict
-
-
-
-def get_url_AZ(artist, song):
-       
-    song = re.sub('['+string.punctuation+']', '', song).replace(' ','').lower()
-    base = 'http://www.azlyrics.com/lyrics/'
-    rest = artist + '/' + song + '.html'
-    return base + rest
 
 
 def get_lyric_AZ(url, proxies, user_agents):
