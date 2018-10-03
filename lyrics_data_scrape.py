@@ -14,16 +14,17 @@ class AzBase():
     def get_base_url(self):
         return self.baseUrl
 
-class Artist(AzBase):
-    def __init___(self, artist_name):
-        super()
-        AzBase()
+class Artist(object):
+    def __init__(self, artist_name):
+    # super()
+    # AzBase()
+        self.baseUrl = 'http://www.azlyrics.com/lyrics/'
         self.artist_name = artist_name
 
     def get_song_list(self):
-        url = AzBase.get_base_url() + self.artist_name[0] + '/' + self.artist_name + '.html'
+        url = self.baseUrl + self.artist_name[0] + '/' + self.artist_name + '.html'
         sleep(random.randint(0, 10))
-        response = requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=random.choice(PROXIES))
+        response = requests.get(url)  #, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=random.choice(PROXIES))
         soup = BeautifulSoup(response.content, 'lxml')
         songs = []
         for song in soup.findAll(target='_blank'):
