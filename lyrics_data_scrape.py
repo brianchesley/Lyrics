@@ -14,16 +14,41 @@ class AzBase():
     def get_base_url(self):
         return self.baseUrl
 
+class Song(AzBase):
+    HTML_TAGS = ['br','div', 'i']
+    def __init__(self, artist_name, song_name):
+        super()
+        AzBase()
+        self.song_name = song_name
+        self.artist_name = artist_name
+
+    def get_lyrics(self):
+        soup = BeautifulSoup(self.get_song_page(), 'lxml')
+        page_lyric = soup.find_all("div", limit=22)[-1] # lyrics start on 22nd div
+        lyrics = ''.join(page_lyric.find_all(text=True))
+        lyrics = re.sub(r'[^\w\s]', " ",  str(lyrics)).split()
+        lyrics = [word for word in lyrics if word not in self.HTML_TAGS]
+        return lyrics[20:]
+
+    def get_song_url(self):
+        print('song name',self.song_name)
+        song_url = re.sub(r'[^\w\s]','', self.song_name).replace(" ",'').lower()
+        base = 'http://www.azlyrics.com/lyrics/'
+        rest = self.artist_name + '/' + song_url + '.html'
+        return base + rest
+
+    def get_song_page(self):
+        response = requests.get(self.get_song_url()) #, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies = random.choice(PROXIES))
+        return response.content
+
 class Artist(object):
     def __init__(self, artist_name):
-    # super()
-    # AzBase()
-        self.baseUrl = 'http://www.azlyrics.com/lyrics/'
+        self.baseUrl = 'http://www.azlyrics.com/'
         self.artist_name = artist_name
+        self.song_list = self.get_song_list()
 
     def get_song_list(self):
         url = self.baseUrl + self.artist_name[0] + '/' + self.artist_name + '.html'
-        sleep(random.randint(0, 10))
         response = requests.get(url)  #, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=random.choice(PROXIES))
         soup = BeautifulSoup(response.content, 'lxml')
         songs = []
@@ -31,35 +56,7 @@ class Artist(object):
             songs.append(str(song.text))
         return songs
 
-class Song(AzBase):
-    def __init__(self, songName, artistName):
-        super()
-        AzBase()
-        self.lyrics = None
-        self.url = None
-        self.song_name = songName
-        self.artist_name = artistName
-        self.song_page = self.get_song_page()
-
-    def get_lyrics(self):
-        soup = BeautifulSoup(self.song_page, 'lxml')
-        page_lyric = soup.findAll(style="margin-left:10px;margin-right:10px;")
-        lyric = re.sub('[(<.!,;?>/\-)]', " ",  str(page_lyric)).split()
-        lyric = [word for word in lyric if word != 'br']
-        return lyric[10:-4]
-
-    def get_song_url(self):
-        song_url = re.sub('['+string.punctuation+']', '', self.song).replace(' ','').lower()
-        base = 'http://www.azlyrics.com/lyrics/'
-        rest = self.artist + '/' + song_url + '.html'
-        return base + rest
-
-    def get_song_page(self):
-        response = requests.get(self.get_song_url(), headers={'User-Agent': random.choice(user_agents)}, proxies = random.choice(proxies))
-        return response
-
 class Cache():
-
     def __init__(self):
         self.CACHE_DIR = os.path.join(os.path.dirname(__file__), 'cache')
 
@@ -68,7 +65,6 @@ class Cache():
         # use a sha1 hash to convert the url into a unique filename
         hash_file = sha1(url).hexdigest() + '.html'
         return os.path.join(self.CACHE_DIR, hash_file)
-
 
     def store_local(self, url, content):
         #Save a local copy of the file.
@@ -86,7 +82,6 @@ class Cache():
         local_path = self.url_to_filename(url)
         if not os.path.exists(local_path):
             return None
-
         with open(local_path, 'rb') as f:
             return f.read()
 
