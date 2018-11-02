@@ -3,17 +3,18 @@ from lyrics_data_scrape import Artist, Song
 
 
 
-# class ArtistTest(unittest.TestCase):
-#     def test_song_list(self):
-#         artist = Artist('drake')
-#         songs = artist.get_song_list()
-#         print(songs)
-#         self.assertIs(type(songs), type([]))
+class ArtistTest(unittest.TestCase):
+    def test_song_list(self):
+        artist = Artist('drake')
+        songs = artist.get_song_list()
+        self.assertIs(type(songs), type([]))
 
 class SongTest(unittest.TestCase):
     def test_lyrics(self):
         song = Song('drake','Where Were You')
-        print(song.get_lyrics())
+        lyrics = song.get_lyrics()
+        self.assertIs(type(lyrics), type([]))
+        self.assertIs(song.get_song_url(), 'https://www.azlyrics.com/lyrics/drake/wherewereyou.html')
 
 if __name__ == '__main__':
     unittest.main()
