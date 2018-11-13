@@ -1,8 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-import os
-from hashlib import sha1
 import random
 from nltk.tokenize import TweetTokenizer
 
@@ -50,7 +48,50 @@ class Song(makeRequest):
         response = makeRequest.get(self, url)
         return response.content
 
-class Artist(makeRequest, Album):
+class Album(Song):
+    def __init__(self, album_info):
+        self.album_info = album_info
+        self.title =  None
+        self.type = None
+        self.year = None
+        self.artist_name = 'drake'
+        self.parse_album_info()
+        self.songs = []
+        # super().__init__()
+
+    def parse_album_info(self):
+        album_info_split = self.album_info.split(':', 1)
+        self.type = album_info_split[0]
+        album_title_year = album_info_split[1].split('"')[1:]
+        self.year = album_title_year[1].replace('(','').replace(')','').strip()
+        self.title = album_title_year[0].strip()
+
+    def get_song_list_page(self):
+        url = self.baseURL + self.artist_name[0] + '/' + self.artist_name + '.html'
+        response = makeRequest.get(self, url)
+        return response
+
+    def get_album_songs(self):
+        soup = BeautifulSoup(self.get_song_list_page().content, 'lxml')
+        albums = soup.find_all("div", {"id": "listAlbum"})
+        children = albums[0].find_all(['a','div'], recursive=False)
+        current = None
+        for child in children:
+            if child.text == self.album_info:
+                current = True
+            elif current:
+                if child.name != 'div':
+                    if child.has_attr('target'):
+                        self.songs.append(child.text)
+                else:
+                    current = False
+                    break
+        return self.songs
+    def __repr__(self):
+        return "Album: {0} from year {1} of type {2}".format(self.title, self.year, self.type)
+
+
+class Artist(makeRequest):
     def __init__(self, artist_name):
         super().__init__()
         self.artist_name = artist_name
@@ -63,30 +104,13 @@ class Artist(makeRequest, Album):
     def get_song_list(self):
         soup = BeautifulSoup(self.get_song_list_page().content, 'lxml')
         songs = []
-        for song in soup.findAll(target='_blank'):
+        for song in soup.find_all(target='_blank'):
             songs.append(str(song.text))
         return songs
 
-    def get_album_information(self):
+    def get_album_info(self):
         soup = BeautifulSoup(self.get_song_list_page().content, 'lxml')
         album_infos = []
-        for album in soup.findAll("div", {"class": "album"}):
+        for album in soup.find_all("div", {"class": "album"}):
             album_infos.append(album.text)
         return album_infos
-
-class Album():
-    def __init__(self, , album_info):
-        super().__init__()
-        self.album_info = album_info
-        self.album_title =
-        self.album_type =
-        self.year =
-
-    def parse_album_info(self):
-        album_info_split = self.album_info.split(':', 1)
-        self.album_title = album_info_split[0]
-        album_title_year = album_info_split
-
-
-
-
