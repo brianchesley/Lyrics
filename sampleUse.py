@@ -11,12 +11,10 @@ database = Database()
 drake = Artist('drake')
 albums = drake.get_album_info()
 
-
-
-views = Album(albums[10])
-
-for song in views.songs:
-    song_class = Song(views.artist_name, song)
-    row = (song_class.song_name, song_class.artist_name, views.type, views.title, views.year, song_class.lyrics)
-    database.insert(row)
+for album in albums:
+    album = Album('drake', album)
+    for song in album.songs:
+        song_class = Song(album.artist_name, song)
+        row = (song_class.song_name, song_class.artist_name, album.type, album.title, album.year, song_class.lyrics)
+        database.insert(row)
 
