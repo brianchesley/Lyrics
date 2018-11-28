@@ -40,7 +40,7 @@ class Artist(MakeRequest):
             songs.append(str(song.text))
         return songs
 
-    def get_album_info(self):
+    def get_album_infos(self):
         soup = BeautifulSoup(self.get_song_list_page().content, 'lxml')
         album_infos = []
         for album in soup.find_all("div", {"class": "album"}):
@@ -52,7 +52,7 @@ class Artist(MakeRequest):
         album_info = {}
         album_info['raw'] = raw_album_info
         if raw_album_info == 'other songs:':
-            return {'type': None, 'year': None, 'title': 'other songs'}
+            return {'type': None, 'year': None, 'title': 'other songs', 'raw': raw_album_info}
         album_info_split = raw_album_info.split(':', 1)
         album_info['type'] = album_info_split[0]
         album_title_year = album_info_split[1].split('"')[1:]
@@ -105,7 +105,7 @@ class Song(MakeRequest):
         self.lyrics = self.get_lyrics()
 
     def get_lyrics(self):
-        time.sleep(5)
+        time.sleep(10)
         soup = BeautifulSoup(self.get_song_page(), 'lxml')
         page_lyric = soup.find_all("div", limit=22)[-1]  # lyrics start on 22nd div
         lyrics = ''.join(page_lyric.find_all(text=True))
