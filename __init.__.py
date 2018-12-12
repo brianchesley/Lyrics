@@ -1,0 +1,1 @@
+from lyrics_data_scrape import Album, Artist, Song
