@@ -26,6 +26,8 @@ def remove_symbols(dict_file):
 
 file = pickle.load(open('rush' + '_lyrics.pickle', 'rb'))
 
+def dog():
+    pass
 
 def analysis(dict_file):
     words = dict_file.values()[0]
