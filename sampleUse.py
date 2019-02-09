@@ -3,10 +3,7 @@ from lyrics_data_scrape import Artist, Song, Album
 
 
 database = Database()
-# database.delete_song_table()
-# database.create_song_table()
-# database.insert(('views','drake','rap','views',2009, 'BLAHBLAHBALH'))
-# database.delete_songs_where(('views',))
+database.create_song_table()
 
 drake = Artist('drake')
 albums = drake.get_album_infos()
